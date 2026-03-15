@@ -13,5 +13,5 @@ app.use('/api/transactions', transactionRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server meluncur di http://localhost:${PORT}`);
+  console.log(`Server jalan di port ${PORT}`);
 });
