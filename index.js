@@ -4,27 +4,21 @@ const transactionRoutes = require('./routes/api');
 
 const app = express();
 
-// 1. CORS: Cukup begini saja, sudah sangat aman untuk Railway
+// 1. CORS Paling Simpel (Paling Ampuh buat Railway)
 app.use(cors()); 
 
-// 2. Parser JSON: Wajib agar req.body tidak kosong
+// 2. Body Parser
 app.use(express.json());
 
-// 3. Rute Utama
-// Pastikan folder 'routes' dan file 'api.js' namanya benar (case-sensitive)
-app.use('/api/transactions', transactionRoutes);
-
-// 4. Test Route (Cek server hidup)
+// 3. Test Route (Buka link backend-mu di browser, harus muncul tulisan ini)
 app.get('/', (req, res) => {
-  res.send('Server Portafoglio Running Well! 🚀');
+  res.send('Arithmos API is Online! 🚀');
 });
 
-// 5. Penanganan 404 yang aman
-app.use((req, res) => {
-  res.status(404).json({ error: `Path ${req.url} tidak ditemukan!` });
-});
+// 4. Utama
+app.use('/api/transactions', transactionRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server ON di port ${PORT}`);
+  console.log(`Server ON port ${PORT}`);
 });
