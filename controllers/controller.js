@@ -17,30 +17,44 @@ exports.addTransaction = async (req, res) => {
   try {
     const newDoc = {
       ...req.body,
+      // Tetap simpan serverTimestamp untuk urusan sorting di DB
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     };
+
     const ref = await transactionsDb.add(newDoc);
-    res.status(201).json({ id: ref.id, ...newDoc });
+
+    // KIRIM BALIK KE FE: 
+    // Gunakan req.body.date (yang dikirim dari FE) agar formatnya tetap YYYY-MM-DD
+    // Jangan kirim objek serverTimestamp ke FE karena akan terbaca sebagai objek kosong
+    res.status(201).json({ 
+      id: ref.id, 
+      ...req.body,
+      createdAt: new Date().toISOString() // Pengganti sementara agar FE tidak bingung
+    });
+
   } catch (error) {
+    console.error("ERROR ADD:", error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// 3. UPDATE DATA (Edit) - INI YANG BARU
+// 3. UPDATE DATA (Edit)
 exports.updateTransaction = async (req, res) => {
   try {
     const { id } = req.params;
     const updatedData = { ...req.body };
 
-    // Hapus ID dari body agar tidak ikut tersimpan sebagai field di dalam Firestore
     delete updatedData.id;
-
-    // Tambahkan timestamp update jika perlu
     updatedData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
 
     await transactionsDb.doc(id).update(updatedData);
     
-    res.status(200).json({ id, ...updatedData });
+    // Pastikan response ke FE bersih
+    res.status(200).json({ 
+      id, 
+      ...updatedData, 
+      updatedAt: new Date().toISOString() 
+    });
   } catch (error) {
     console.error("ERROR UPDATE:", error);
     res.status(500).json({ message: error.message });
